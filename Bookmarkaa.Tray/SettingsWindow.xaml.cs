@@ -1,3 +1,4 @@
+using Bookmarkaa.Helpers;
 using Bookmarkaa.Managers;
 using System.Windows;
 using System.Windows.Forms;
@@ -23,6 +24,10 @@ namespace Bookmarkaa.Tray
             _keyCode = SettingsManager.Settings.HotKeyCode;
             TxtHotKey.Text = FormatHotKey(_modifiers, _keyCode);
             TxtIconsFolder.Text = SettingsManager.Settings.DefaultIconsFolder;
+
+            PanelTabsInfo.Visibility = FileExplorerProcess.ExplorerTabsSupported
+                ? Visibility.Collapsed
+                : Visibility.Visible;
         }
 
         private void TxtHotKey_GotFocus(object sender, RoutedEventArgs e)

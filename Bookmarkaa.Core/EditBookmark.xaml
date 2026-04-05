@@ -1,4 +1,4 @@
-﻿<Window x:Class="Bookmarkaa.EditBookmark"
+<Window x:Class="Bookmarkaa.EditBookmark"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,28 +6,87 @@
         xmlns:local="clr-namespace:Bookmarkaa"
         mc:Ignorable="d"
         Style="{StaticResource {x:Type Window}}"
-        Title="EditBookmark" Height="140" Width="800">
+        Title="Edytuj zakładkę" Height="300" Width="560" MinHeight="220" MinWidth="400"
+        ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterOwner"
+        Closing="Window_Closing">
 
-    <Grid Height="786" VerticalAlignment="Top">
-        <Rectangle x:Name="Icon" Height="48" Width="48" Margin="13,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" MouseDown="Icon_MouseDown">
-            <Rectangle.Fill>
-                <ImageBrush ImageSource="{Binding IconBrush}"/>
-            </Rectangle.Fill>
-        </Rectangle>
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <TextBox x:Name="Name" HorizontalAlignment="Left" Margin="75,4,0,0" VerticalAlignment="Top" Height="26" Width="541" />
-        <TextBox x:Name="Folder" HorizontalAlignment="Left" Margin="75,34,0,0" VerticalAlignment="Top" Height="26" Width="510"/>
-        <Rectangle x:Name="SelectFolder" Height="20" Width="20" Margin="592,37,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" MouseDown="SelectFolder_MouseDown">
-            <Rectangle.Fill>
-                <ImageBrush ImageSource="{StaticResource ResourceKey=ic_folder}"/>
-            </Rectangle.Fill>
+        <!-- Wiersz 0: Ikona + Nazwa -->
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Rectangle x:Name="Icon" Height="48" Width="48" Margin="0,0,10,0"
+                       Grid.Column="0" VerticalAlignment="Center" Cursor="Hand"
+                       MouseDown="Icon_MouseDown">
+                <Rectangle.Fill>
+                    <ImageBrush/>
+                </Rectangle.Fill>
+            </Rectangle>
+            <TextBox x:Name="NameBox" Grid.Column="1" VerticalAlignment="Center" Height="26"/>
+        </Grid>
 
-        </Rectangle>
+        <!-- Wiersz 1: Lista folderów -->
+        <ListBox x:Name="FoldersList" Grid.Row="1"
+                 Background="#FF3C3C3C" BorderBrush="#FF555555" BorderThickness="1"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 AllowDrop="True"
+                 DragOver="FoldersList_DragOver"
+                 Drop="FoldersList_Drop">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Padding" Value="4,2"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#FF555555"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#FF484848"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center"
+                                   Foreground="White" Margin="2,0" TextTrimming="CharacterEllipsis"/>
+                        <Button Grid.Column="1" Content="×" Width="22" Height="22"
+                                Tag="{Binding}" Click="RemoveFolder_Click"
+                                Padding="0" Margin="6,0,0,0"
+                                FontWeight="Bold" FontSize="13"
+                                ToolTip="Usuń folder z listy"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
-        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="640,4,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.088,-0.223" Height="28" Width="131" Click="SaveButton_Click"/>
-        <Button x:Name="CancelButton"  Content="Cancel" HorizontalAlignment="Left" Margin="640,37,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.088,-0.223" Height="28" Width="131" Click="CancelButton_Click"/>
-        <Button x:Name="DeleteButton"  Content="Delete" HorizontalAlignment="Left" Margin="640,70,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.088,-0.223" Height="28" Width="131" Click="DeleteButton_Click"/>
-
-
+        <!-- Wiersz 2: Dodaj folder -->
+        <Grid Grid.Row="2" Margin="0,6,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="NewFolderBox" Grid.Column="0" Height="26" Margin="0,0,6,0"
+                     KeyDown="NewFolderBox_KeyDown"/>
+            <Button x:Name="BtnAddFolder" Grid.Column="1" Content="..." Height="26" Width="32"
+                    Click="BtnAddFolder_Click" ToolTip="Wybierz folder"/>
+        </Grid>
     </Grid>
 </Window>

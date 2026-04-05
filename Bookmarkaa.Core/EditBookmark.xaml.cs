@@ -1,43 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Bookmarkaa.Helpers;
 using Bookmarkaa.Managers;
 using Bookmarkaa.Models;
+using Microsoft.Win32;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Bookmarkaa
 {
-    /// <summary>
-    /// Interaction logic for EditBookmark.xaml
-    /// </summary>
     public partial class EditBookmark : Window
     {
-        Bookmark _item = new Bookmark();
+        private readonly Bookmark _item;
+        private readonly ObservableCollection<string> _folders = new();
 
-        protected string IconPath { 
+        protected string IconPath
+        {
             get
             {
-                ImageBrush brush = (ImageBrush)Icon.Fill;
-                Uri uri = new Uri(brush.ImageSource.ToString());
-                if (uri.AbsoluteUri.StartsWith("pack:"))
-                {
+                var brush = (ImageBrush)Icon.Fill;
+                if (brush.ImageSource == null)
                     return string.Empty;
-                }
-                else
-                {
-                    return uri.LocalPath;
-                }
-            } 
+                var uri = new Uri(brush.ImageSource.ToString()!);
+                return uri.AbsoluteUri.StartsWith("pack:") ? string.Empty : uri.LocalPath;
+            }
         }
 
         public EditBookmark(Bookmark item)
@@ -45,60 +33,126 @@ namespace Bookmarkaa
             _item = item;
             InitializeComponent();
 
-            Name.Text = _item.Name;
-            Folder.Text = _item.Folder;
+            NameBox.Text = _item.Name;
             Icon.Fill = _item.IconBrush;
+
+            foreach (var folder in _item.Folders)
+                _folders.Add(folder);
+
+            FoldersList.ItemsSource = _folders;
+
+            // Synchronizacja na żywo: foldery → _item
+            _folders.CollectionChanged += (_, _) =>
+                _item.Folders = new List<string>(_folders);
+
+            // Synchronizacja na żywo: nazwa → _item
+            NameBox.TextChanged += (_, _) =>
+                _item.Name = NameBox.Text;
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
-            _item.Name = Name.Text;
-            _item.Folder = Folder.Text;
-            _item.IconPath = IconPath;            
-            this.DialogResult = true;
+            // Dodaj ewentualnie wpisany, niezatwierdzony folder
+            TryAddNewFolderFromBox();
+
+            // Zapewnij że DialogResult jest ustawiony (zamknięcie przez X = akceptacja)
+            DialogResult ??= true;
         }
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        private void BtnAddFolder_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            var dialog = new OpenFolderDialog
+            {
+                Title = "Wybierz folder",
+                InitialDirectory = GetInitialDirectory()
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                AddFolder(dialog.FolderName);
+                NewFolderBox.Clear();
+            }
         }
 
-        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        private void NewFolderBox_KeyDown(object sender, KeyEventArgs e)
         {
-            _item.IsDeleted = true;
-            this.DialogResult = true;
+            if (e.Key == Key.Enter)
+            {
+                TryAddNewFolderFromBox();
+                e.Handled = true;
+            }
+        }
+
+        private void RemoveFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button btn && btn.Tag is string folder)
+                _folders.Remove(folder);
+        }
+
+        private void FoldersList_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop)
+                ? DragDropEffects.Copy
+                : DragDropEffects.None;
+            e.Handled = true;
+        }
+
+        private void FoldersList_Drop(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+                return;
+
+            var paths = (string[])e.Data.GetData(DataFormats.FileDrop);
+            foreach (var path in paths)
+            {
+                var folder = System.IO.Directory.Exists(path)
+                    ? path
+                    : System.IO.Path.GetDirectoryName(path) ?? string.Empty;
+
+                AddFolder(folder);
+            }
         }
 
         private void Icon_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            
-            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
-            openFileDialog.Filter = Constants.IconFileFilter;
-            openFileDialog.Multiselect = false;
-            openFileDialog.DefaultDirectory = SettingsManager.Settings.DefaultIconsFolder;
-            openFileDialog.InitialDirectory = IconPath == string.Empty ? openFileDialog.DefaultDirectory : FileExplorerProcess.GetFolderPath(IconPath);
-            bool? status = openFileDialog.ShowDialog();
-            if (status != null && status == true)
+            var dialog = new OpenFileDialog
             {
-                // _item.IconPath = openFileDialog.FileName;
-                Icon.Fill = new ImageBrush(new BitmapImage(new Uri(openFileDialog.FileName)));
+                Filter = Constants.IconFileFilter,
+                Multiselect = false,
+                DefaultDirectory = SettingsManager.Settings.DefaultIconsFolder,
+                InitialDirectory = IconPath == string.Empty
+                    ? SettingsManager.Settings.DefaultIconsFolder
+                    : FileExplorerProcess.GetFolderPath(IconPath)
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                Icon.Fill = new ImageBrush(new BitmapImage(new Uri(dialog.FileName)));
+                _item.IconPath = dialog.FileName;
             }
         }
 
-        private void SelectFolder_MouseDown(object sender, MouseButtonEventArgs e)
+        private void AddFolder(string path)
         {
-            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
-            openFileDialog.FileName = "Wybierz folder";
-            openFileDialog.Multiselect = false;
-            openFileDialog.CheckFileExists = false;
-            // openFileDialog.DefaultDirectory = SettingsManager.Settings.DefaultIconsFolder;
-            openFileDialog.InitialDirectory = Folder.Text;
-            bool? status = openFileDialog.ShowDialog();
-            if (status != null && status == true)
-            {
-                Folder.Text = FileExplorerProcess.GetFolderPath(openFileDialog.FileName);
-                // Folder.Text = Folder.Text;
-            }
+            if (!string.IsNullOrEmpty(path) && !_folders.Contains(path))
+                _folders.Add(path);
+        }
+
+        private void TryAddNewFolderFromBox()
+        {
+            var path = FileExplorerProcess.GetFolderPath(NewFolderBox.Text.Trim());
+            AddFolder(path);
+            if (!string.IsNullOrEmpty(path))
+                NewFolderBox.Clear();
+        }
+
+        private string GetInitialDirectory()
+        {
+            if (FoldersList.SelectedItem is string selected)
+                return selected;
+            if (_folders.Count > 0)
+                return _folders[^1];
+            return string.Empty;
         }
     }
 }

@@ -101,6 +101,11 @@ namespace Bookmarkaa
             Dirty = true;
         }
 
+        public void DeleteBookmark(Bookmark bookmark)
+        {
+            Items.Remove(bookmark); // Items_CollectionChanged ustawi Dirty = true
+        }
+
         private void BookmarksList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Zaznaczenie śledzone tylko przez UI — akcja wywoływana z kliknięcia lub Enter
@@ -130,15 +135,11 @@ namespace Bookmarkaa
             if (edit)
             {
                 EditBookmark editBookmark = new EditBookmark(item);
-                bool? status = editBookmark.ShowDialog();
-                if (status == true)
-                {
-                    Dirty = true;
-                    if (item.IsDeleted)
-                        Items.Remove(item);
-                    SettingsManager.Settings.Bookmarks = new List<Bookmark>(Items);
-                    BookmarksList.Items.Refresh();
-                }
+                editBookmark.ShowDialog();
+                // Brak przycisku Anuluj – każde zamknięcie okna traktujemy jako zatwierdzenie
+                Dirty = true;
+                SettingsManager.Settings.Bookmarks = new List<Bookmark>(Items);
+                BookmarksList.Items.Refresh();
                 BookmarksList.SelectedItem = null;
             }
             else
