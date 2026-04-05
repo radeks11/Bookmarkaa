@@ -1,0 +1,33 @@
+﻿<Window x:Class="Bookmarkaa.EditBookmark"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Bookmarkaa"
+        mc:Ignorable="d"
+        Style="{StaticResource {x:Type Window}}"
+        Title="EditBookmark" Height="140" Width="800">
+
+    <Grid Height="786" VerticalAlignment="Top">
+        <Rectangle x:Name="Icon" Height="48" Width="48" Margin="13,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" MouseDown="Icon_MouseDown">
+            <Rectangle.Fill>
+                <ImageBrush ImageSource="{Binding IconBrush}"/>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <TextBox x:Name="Name" HorizontalAlignment="Left" Margin="75,4,0,0" VerticalAlignment="Top" Height="26" Width="541" />
+        <TextBox x:Name="Folder" HorizontalAlignment="Left" Margin="75,34,0,0" VerticalAlignment="Top" Height="26" Width="510"/>
+        <Rectangle x:Name="SelectFolder" Height="20" Width="20" Margin="592,37,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" MouseDown="SelectFolder_MouseDown">
+            <Rectangle.Fill>
+                <ImageBrush ImageSource="{StaticResource ResourceKey=ic_folder}"/>
+            </Rectangle.Fill>
+
+        </Rectangle>
+
+        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="640,4,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.088,-0.223" Height="28" Width="131" Click="SaveButton_Click"/>
+        <Button x:Name="CancelButton"  Content="Cancel" HorizontalAlignment="Left" Margin="640,37,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.088,-0.223" Height="28" Width="131" Click="CancelButton_Click"/>
+        <Button x:Name="DeleteButton"  Content="Delete" HorizontalAlignment="Left" Margin="640,70,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.088,-0.223" Height="28" Width="131" Click="DeleteButton_Click"/>
+
+
+    </Grid>
+</Window>

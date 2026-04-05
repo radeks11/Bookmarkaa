@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Bookmarkaa.PowerToys</RootNamespace>
+    <AssemblyName>Bookmarkaa.PowerToys</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bookmarkaa.Core\Bookmarkaa.Core.csproj" />
+  </ItemGroup>
+
+</Project>
