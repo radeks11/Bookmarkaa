@@ -22,6 +22,7 @@ namespace Bookmarkaa.Tray
             _modifiers = SettingsManager.Settings.HotKeyModifiers;
             _keyCode = SettingsManager.Settings.HotKeyCode;
             TxtHotKey.Text = FormatHotKey(_modifiers, _keyCode);
+            TxtIconsFolder.Text = SettingsManager.Settings.DefaultIconsFolder;
         }
 
         private void TxtHotKey_GotFocus(object sender, RoutedEventArgs e)
@@ -61,11 +62,24 @@ namespace Bookmarkaa.Tray
             TxtHotKey.Text = FormatHotKey(_modifiers, _keyCode);
         }
 
+        private void BtnBrowseIconsFolder_Click(object sender, RoutedEventArgs e)
+        {
+            using var dialog = new FolderBrowserDialog
+            {
+                Description = "Wybierz folder ikon",
+                SelectedPath = TxtIconsFolder.Text
+            };
+
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                TxtIconsFolder.Text = dialog.SelectedPath;
+        }
+
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
             SettingsManager.Settings.RunAtStartup = ChkStartup.IsChecked == true;
             SettingsManager.Settings.HotKeyModifiers = _modifiers;
             SettingsManager.Settings.HotKeyCode = _keyCode;
+            SettingsManager.Settings.DefaultIconsFolder = TxtIconsFolder.Text;
             SettingsManager.SaveSettings();
 
             StartupManager.Apply(SettingsManager.Settings.RunAtStartup);

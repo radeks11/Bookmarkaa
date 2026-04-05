@@ -1,11 +1,8 @@
-﻿using Bookmarkaa.Helpers;
-using System.Text.Json.Serialization;
-
-namespace Bookmarkaa.Models
+﻿namespace Bookmarkaa.Models
 {
     public class AppSettings
     {
-        public string DefaultIconsFolder { get; set; } = @"C:\Storage\Synology_Drive_RASoft\home\Tools\icons\special";
+        public string DefaultIconsFolder { get; set; } = string.Empty;
         public List<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
 
         // Tray settings
