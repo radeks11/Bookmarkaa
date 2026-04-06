@@ -23,23 +23,40 @@
             <Setter Property="Padding" Value="16,4"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#FF3A3A3A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FF555555"/>
+            <Setter Property="CaretBrush" Value="White"/>
+        </Style>
+        <Style TargetType="TextBox" x:Key="DisabledTextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="#FF777777"/>
+                    <Setter Property="Background" Value="#FF2E2E2E"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>  <!-- 0: Autostart -->
+            <RowDefinition Height="Auto"/>  <!-- 1: Skrót główny -->
+            <RowDefinition Height="Auto"/>  <!-- 2: Folder ikon -->
+            <RowDefinition Height="Auto"/>  <!-- 3: Separator sekcji -->
+            <RowDefinition Height="Auto"/>  <!-- 4: Włącz duplikowanie -->
+            <RowDefinition Height="Auto"/>  <!-- 5: Skrót duplikowania -->
+            <RowDefinition Height="Auto"/>  <!-- 6: Info o zakładkach -->
             <RowDefinition Height="*" MinHeight="8"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>  <!-- 8: Przyciski -->
         </Grid.RowDefinitions>
 
         <!-- Autostart -->
         <CheckBox x:Name="ChkStartup" Grid.Row="0" Margin="0,0,0,12"
                   Content="Uruchamiaj razem z systemem"/>
 
-        <!-- Hotkey -->
+        <!-- Hotkey główny -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -47,15 +64,13 @@
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="Skrót klawiszowy:" Margin="0,0,10,0"/>
             <TextBox x:Name="TxtHotKey" Grid.Column="1"
-                     Background="#FF3A3A3A" Foreground="White"
-                     BorderBrush="#FF555555" CaretBrush="White"
                      IsReadOnly="True" Cursor="Arrow"
                      PreviewKeyDown="TxtHotKey_PreviewKeyDown"
                      GotFocus="TxtHotKey_GotFocus"
                      LostFocus="TxtHotKey_LostFocus"/>
         </Grid>
 
-        <!-- DefaultIconsFolder -->
+        <!-- Folder ikon -->
         <Grid Grid.Row="2" Margin="0,12,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -63,15 +78,42 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="Folder ikon:" Margin="0,0,10,0"/>
-            <TextBox x:Name="TxtIconsFolder" Grid.Column="1"
-                     Background="#FF3A3A3A" Foreground="White"
-                     BorderBrush="#FF555555" CaretBrush="White"/>
+            <TextBox x:Name="TxtIconsFolder" Grid.Column="1"/>
             <Button x:Name="BtnBrowseIconsFolder" Grid.Column="2" Content="..." Padding="8,4"
                     Margin="6,0,0,0" Click="BtnBrowseIconsFolder_Click"/>
         </Grid>
 
+        <!-- Separator sekcji -->
+        <StackPanel Grid.Row="3" Margin="0,16,0,6">
+            <TextBlock Text="Duplikowanie aktywnej zakładki Eksploratora"
+                       Foreground="#FF999999" FontSize="10"/>
+            <Rectangle Height="1" Fill="#FF444444" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Włącz duplikowanie -->
+        <CheckBox x:Name="ChkDuplicateTab" Grid.Row="4"
+                  Content="Włącz duplikowanie zakładki"
+                  Checked="ChkDuplicateTab_Changed"
+                  Unchecked="ChkDuplicateTab_Changed"/>
+
+        <!-- Skrót duplikowania -->
+        <Grid Grid.Row="5" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Content="Skrót duplikowania:" Margin="0,0,10,0"
+                   x:Name="LblDupHotKey"/>
+            <TextBox x:Name="TxtDupHotKey" Grid.Column="1"
+                     Style="{StaticResource DisabledTextBox}"
+                     IsReadOnly="True" Cursor="Arrow"
+                     PreviewKeyDown="TxtDupHotKey_PreviewKeyDown"
+                     GotFocus="TxtDupHotKey_GotFocus"
+                     LostFocus="TxtDupHotKey_LostFocus"/>
+        </Grid>
+
         <!-- Info: zakładki Eksploratora nieobsługiwane -->
-        <Border x:Name="PanelTabsInfo" Grid.Row="3" Margin="0,14,0,0"
+        <Border x:Name="PanelTabsInfo" Grid.Row="6" Margin="0,14,0,0"
                 Background="#3A2800" BorderBrush="#CC7700" BorderThickness="1"
                 CornerRadius="3" Padding="10,8"
                 Visibility="Collapsed">
@@ -83,8 +125,8 @@
             </StackPanel>
         </Border>
 
-        <!-- Buttons -->
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+        <!-- Przyciski -->
+        <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <Button x:Name="BtnSave" Content="Zapisz" Margin="0,0,8,0" Click="BtnSave_Click"/>
             <Button x:Name="BtnCancel" Content="Anuluj" Click="BtnCancel_Click"/>
         </StackPanel>

@@ -50,6 +50,12 @@ namespace Bookmarkaa.Tray
                 SettingsManager.Settings.HotKeyModifiers,
                 (Keys)SettingsManager.Settings.HotKeyCode,
                 ShowMainWindow);
+
+            if (SettingsManager.Settings.DuplicateTabEnabled)
+                _hotKeyManager.Register(
+                    SettingsManager.Settings.DuplicateTabHotKeyModifiers,
+                    (Keys)SettingsManager.Settings.DuplicateTabHotKeyCode,
+                    ExplorerDuplicator.DuplicateActiveTab);
         }
 
         public void ShowMainWindow()

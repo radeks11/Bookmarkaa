@@ -74,6 +74,13 @@ namespace Bookmarkaa.Helpers
             }
         }
 
+        /// <summary>
+        /// Otwiera podaną ścieżkę jako nową zakładkę w istniejącym oknie Eksploratora.
+        /// Wymaga Windows 11 22H2 lub nowszego.
+        /// </summary>
+        public static async Task OpenInNewTabAsync(IntPtr explorerHwnd, string path)
+            => await OpenFolderInNewTabAsync(explorerHwnd, path);
+
         private static async Task OpenFolderInNewTabAsync(IntPtr hwnd, string folderPath)
         {
             SetForegroundWindow(hwnd);
